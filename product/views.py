@@ -1,13 +1,14 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Count, Avg
 from .models import Category, Product, Review
 from .serializers import CategorySerializer, ProductSerializer, ReviewSerializer
 
 
 @api_view(['GET'])
 def category_list_api_view(request):
-    categories = Category.objects.all()
+    categories = Category.objects.annotate(products_count=Count('products'))
     serializer = CategorySerializer(categories, many=True)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
@@ -23,8 +24,15 @@ def category_detail_api_view(request, id):
 
 
 @api_view(['GET'])
+def product_reviews_api_view(request):
+    products = Product.objects.annotate(rating=Avg('reviews__stars'))
+    serializer = ProductSerializer(products, many=True)
+    return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
 def product_list_api_view(request):
-    products = Product.objects.all()
+    products = Product.objects.annotate(rating=Avg('reviews__stars'))
     serializer = ProductSerializer(products, many=True)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
@@ -32,7 +40,7 @@ def product_list_api_view(request):
 @api_view(['GET'])
 def product_detail_api_view(request, id):
     try:
-        product = Product.objects.get(id=id)
+        product = Product.objects.annotate(rating=Avg('reviews__stars')).get(id=id)
     except:
         return Response(data={"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
     serializer = ProductSerializer(product)
