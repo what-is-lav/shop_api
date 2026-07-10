@@ -11,6 +11,8 @@ from .serializers import (
 
 @api_view(['GET', 'POST'])
 def category_list_api_view(request):
+    print(request.user)
+    
     if request.method == 'GET':
         categories = Category.objects.annotate(products_count=Count('products'))
         return Response(data=CategorySerializer(categories, many=True).data)
@@ -29,6 +31,8 @@ def category_list_api_view(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def category_detail_api_view(request, id):
+    print(request.user)
+    
     try:
         category = Category.objects.annotate(products_count=Count('products')).get(id=id)
     except Category.DoesNotExist:
@@ -55,12 +59,16 @@ def category_detail_api_view(request, id):
 
 @api_view(['GET'])
 def product_reviews_api_view(request):
+    print(request.user)
+    
     products = Product.objects.annotate(rating=Avg('reviews__stars'))
     return Response(data=ProductSerializer(products, many=True).data)
 
 
 @api_view(['GET', 'POST'])
 def product_list_api_view(request):
+    print(request.user)
+    
     if request.method == 'GET':
         products = Product.objects.annotate(rating=Avg('reviews__stars'))
         return Response(data=ProductSerializer(products, many=True).data)
@@ -88,6 +96,8 @@ def product_list_api_view(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def product_detail_api_view(request, id):
+    print(request.user)
+    
     try:
         product = Product.objects.annotate(rating=Avg('reviews__stars')).get(id=id)
     except Product.DoesNotExist:
@@ -117,6 +127,8 @@ def product_detail_api_view(request, id):
 
 @api_view(['GET', 'POST'])
 def review_list_api_view(request):
+    print(request.user)
+    
     if request.method == 'GET':
         reviews = Review.objects.all()
         return Response(data=ReviewSerializer(reviews, many=True).data)
@@ -140,6 +152,8 @@ def review_list_api_view(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def review_detail_api_view(request, id):
+    print(request.user)
+    
     try:
         review = Review.objects.get(id=id)
     except Review.DoesNotExist:
