@@ -1,0 +1,24 @@
+version: '3'
+services:
+  magazin_app:
+    build:
+      context: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    environment:
+      NAME_DB: magazin_db
+      USER_DB: magazin_db_user
+      PASSWORD_DB: 123
+      HOST_DB: db_data
+      PORT_DB: 5432
+  db_data:
+    image: 'postgres:14'
+    environment:
+      POSTGRES_DB: magazin_db
+      POSTGRES_USER: magazin_db_user
+      POSTGRES_PASSWORD: 123
+    volumes:
+      - 'pg_data:/var/lib/postgresql/data'
+volumes:
+  pg_data:
